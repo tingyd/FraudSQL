@@ -17,3 +17,6 @@ def attack_1():
         conn.commit()
         st.success("Data retrieved!")
         st.write(result)
+        
+def prevention_1():
+    st.title("Test")
