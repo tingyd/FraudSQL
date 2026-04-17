@@ -1,17 +1,14 @@
 import streamlit as st
 import mysql.connector
+import method1
 
-user_input = st.text_input("Enter your dat:")
+st.sidebar.title("Navigation")
+selected_tab = st.sidebar.radio("Go to:", ["Attack 1", "Prevention 1", "Attack 2", "Prevention 2", "Attack 3", "Prevention 3"])
 
-if st.button("Submit"):
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        database="transactions_db"
-    )
-    cursor = conn.cursor()
-    cursor.execute(f"SELECT * FROM transaction WHERE Cc_num = {user_input}")
-    result = cursor.fetchall()
-    conn.commit()
-    st.success("Data retrieved!")
-    st.write(result)
+if selected_tab == "Attack 1":
+    method1.attack_1()
+
+elif selected_tab == "Prevention 1":
+    ...
+
+        
