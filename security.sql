@@ -29,6 +29,7 @@ WHERE rn = 1;
 INSERT INTO users (username, password, role, cc_num) VALUES
 ('admin', 'admin123', 'admin', NULL);
 
-CREATE USER IF NOT EXISTS 'app_user'@'localhost' IDENTIFIED BY 'apppassword';
+DROP USER IF EXISTS 'app_user'@'localhost';
+CREATE USER 'app_user'@'localhost' IDENTIFIED BY 'client123';
 GRANT SELECT ON transactions_db.users TO 'app_user'@'localhost';
 FLUSH PRIVILEGES;

@@ -14,6 +14,6 @@ def get_safe_conn():
     return mysql.connector.connect(
         host="localhost",
         user="app_user",
-        password="apppassword",
+        password="client123",
         database="transactions_db"
     )

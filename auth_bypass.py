@@ -5,7 +5,7 @@ def attack_1():
     st.title(" Authentication Bypass")
     st.markdown("**Try a normal login first, then try the injection below**")
     st.code("Username: admin    Password: anything")
-    st.code("' OR '1'='1' --   ← paste this into username to bypass login")
+    st.code("' OR '1'='1 --   ← paste this into username to bypass login")
 
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
@@ -28,7 +28,6 @@ def attack_1():
             st.write(result)
 
             st.markdown("---")
-            st.error("⚠️ Attacker now has access to sensitive cardholder data:")
 
             cursor2 = conn.cursor()
             cursor2.execute("""
@@ -76,3 +75,4 @@ def prevention_1():
             st.write(result)
         else:
             st.info("No records found. Injection attempt blocked.")
+            conn.close()
