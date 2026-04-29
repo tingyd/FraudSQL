@@ -1,13 +1,6 @@
 import streamlit as st
 import mysql.connector
-
-
-def _connect_db():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        database="transactions_db",
-    )
+from db import get_conn, get_safe_conn
 
 
 def attack_3():
@@ -37,7 +30,7 @@ The attacker infers TRUE/FALSE from behavior changes (e.g., login success vs fai
     )
 
     if st.button("Run Vulnerable Login", key="a3_run"):
-        conn = _connect_db()
+        conn = get_conn()
         cursor = conn.cursor(dictionary=True, buffered=True)
 
         vulnerable_query = (
@@ -80,7 +73,7 @@ This defense blocks blind SQLi by treating user input as data, not executable SQ
     )
 
     if st.button("Setup Demo Users + Procedure", key="p3_setup"):
-        conn = _connect_db()
+        conn = get_safe_conn()
         cursor = conn.cursor()
         try:
             cursor.execute(

@@ -48,6 +48,7 @@ def attack_1():
 
         else:
             st.info("No records found.")
+            conn.close()
 
 
 def prevention_1():
