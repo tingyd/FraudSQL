@@ -1,7 +1,7 @@
 
-DROP DATABASE IF EXISTS fraud_detection;
-CREATE DATABASE fraud_detection;
-USE fraud_detection;
+DROP DATABASE IF EXISTS transactions_db;
+CREATE DATABASE transactions_db;
+USE transactions_db;
 
 -- STAGING — Raw import
 
@@ -33,7 +33,7 @@ CREATE TABLE staging (
 );
 
 -- Import via terminal (run in a separate terminal window):
--- mysql --local-infile=1 -u root -p fraud_detection
+-- mysql --local-infile=1 -u root -p transactions_db
 -- LOAD DATA LOCAL INFILE '/path/fraudTest.csv'
 -- INTO TABLE staging FIELDS TERMINATED BY ',' ENCLOSED BY '"'
 -- LINES TERMINATED BY '\n' IGNORE 1 ROWS;
