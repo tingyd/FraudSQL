@@ -6,20 +6,18 @@ A database security project demonstrating SQL injection attack types and defense
 
 ## Project Overview
 
-This project uses a credit card fraud transaction dataset as the target database to demonstrate how SQL injection attacks work and how to defend against them.
-
 | Person | Attack | Defense |
 |---|---|---|
-| Person 1 | Authentication Bypass | User roles & privileges |
-| Person 2 | UNION-based injection | Views |
-| Person 3 | Blind/Boolean injection | Stored procedures |
+| Person 1 | Authentication Bypass | User Roles & Privileges + Parameterized Queries |
+| Person 2 | UNION-based Injection | Views |
+| Person 3 | Blind/Boolean Injection | Stored Procedures |
 
 ---
 
 ## Project Structure
 
 ```
-fraud-detection/
+FraudSQL/
 │
 ├── data/                        # Exported CSVs from MySQL (3NF tables)
 │   ├── location.csv
@@ -27,9 +25,14 @@ fraud-detection/
 │   ├── merchant.csv
 │   └── transaction.csv
 │
-├── fraudDetection.sql           # Full schema: staging → 1NF → 2NF → 3NF
-├── import_csv.py                # Imports CSVs into MySQL via SQLAlchemy
-├── ui.py                        # Streamlit frontend (login + fraud alerts)
+├── normalize.sql                # Full schema: staging → 1NF → 2NF → 3NF (fraud_detection db)
+├── security.sql                 # Creates users table, app_user credentials, and grants
+├── import_csv.py                # Imports CSVs into transactions_db via SQLAlchemy
+├── db.py                        # Database connection helpers (get_conn, get_safe_conn)
+├── auth_bypass.py               # Method 1: Authentication bypass attack + prevention
+├── union_attack.py              # Method 2: UNION injection attack + prevention
+├── method3.py                   # Method 3: Blind/Boolean injection attack + prevention
+├── ui.py                        # Streamlit frontend — navigation across all methods
 ├── requirements.txt             # Python dependencies
 └── README.MD
 ```
@@ -44,7 +47,7 @@ The raw dataset was normalized through three stages:
 - **2NF** — Removed partial dependencies, extracted `cardholder` and `merchant` tables
 - **3NF** — Removed transitive dependencies, extracted `location` table (zip → city, state, lat, long, city_pop)
 
-Final tables:
+Final tables in `transactions_db`:
 
 | Table | Primary Key | Description |
 |---|---|---|
@@ -52,6 +55,17 @@ Final tables:
 | `cardholder` | `cc_num` | Cardholder personal info, FK to location |
 | `merchant` | `merchant_id` | Merchant name, category, coordinates |
 | `transaction` | `trans_num` | Transaction facts, FK to cardholder & merchant |
+| `users` | `user_id` | App-level logins generated from cardholder data |
+| `app_users` | `user_id` | Demo users for Method 3 blind/boolean injection |
+
+---
+
+## Database Users
+
+| User | Password | Access |
+|---|---|---|
+| `root` | your local root password | Full access — used in attack demos |
+| `app_user` | `client123` | SELECT on `users` only — used in prevention demos |
 
 ---
 
@@ -60,7 +74,7 @@ Final tables:
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/tingyd/FraudSQL.git
-cd fraud-detection
+cd FraudSQL
 ```
 
 ### 2. Install dependencies
@@ -68,32 +82,43 @@ cd fraud-detection
 pip install -r requirements.txt
 ```
 
-### 3. Set up the database
-Run the schema script in MySQL Workbench or terminal:
-```bash
-mysql -u root -p < fraudDetection.sql
-```
-
-Then import the raw CSV:
-```bash
-mysql --local-infile=1 -u root -p fraud_detection
-```
-```sql
-LOAD DATA LOCAL INFILE '/path/to/fraudTest.csv'
-INTO TABLE staging FIELDS TERMINATED BY ',' ENCLOSED BY '"'
-LINES TERMINATED BY '\n' IGNORE 1 ROWS;
-```
-
-### 4. Import CSVs (alternative)
-If you already have the CSVs in `data/`, you can import directly:
+### 3. Import CSVs into transactions_db
+Make sure the CSVs are in the `data/` folder, then run:
 ```bash
 python import_csv.py
+```
+
+### 4. Run security setup
+This creates the `users` table, populates it from cardholder data, and sets up `app_user`:
+```bash
+mysql -u root -p transactions_db < security.sql
 ```
 
 ### 5. Run the app
 ```bash
 streamlit run ui.py
 ```
+
+---
+
+## Connection Helpers (db.py)
+
+- `get_conn()` — connects as `root`, full access, used in **attack** demos
+- `get_safe_conn()` — connects as `app_user`, restricted access, used in **prevention** demos
+
+---
+
+## Demo Payloads
+
+**Auth Bypass (Method 1)**
+- Username: `' OR '1'='1 --` / Password: anything
+
+**UNION Injection (Method 2)**
+- `' UNION SELECT *, NULL, NULL, NULL FROM merchant --`
+
+**Blind/Boolean (Method 3)**
+- TRUE payload: `' OR (1=1) -- `
+- FALSE payload: `' OR (1=2) -- `
 
 ---
 
