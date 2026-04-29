@@ -25,7 +25,7 @@ FraudSQL/
 │   ├── merchant.csv
 │   └── transaction.csv
 │
-├── normalize.sql                # Full schema: staging → 1NF → 2NF → 3NF (fraud_detection db)
+├── normalize.sql                # Full schema: staging → 1NF → 2NF → 3NF (transactions_db)
 ├── security.sql                 # Creates users table, app_user credentials, and grants
 ├── import_csv.py                # Imports CSVs into transactions_db via SQLAlchemy
 ├── db.py                        # Database connection helpers (get_conn, get_safe_conn)
